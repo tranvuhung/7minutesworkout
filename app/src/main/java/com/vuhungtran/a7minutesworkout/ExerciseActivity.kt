@@ -3,6 +3,7 @@ package com.vuhungtran.a7minutesworkout
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.View
 import android.widget.Toast
 import com.vuhungtran.a7minutesworkout.databinding.ActivityExerciseBinding
 
@@ -13,6 +14,8 @@ class ExerciseActivity : AppCompatActivity() {
     // Variable for timer progress. As initial value the rest progress is set to 0. As we are about to start.
     private var restProgress = 0
     //END
+    private var exerciseTimer: CountDownTimer? = null // Variable for Exercise Timer and later on we will initialize it.
+    private var exerciseProgress = 0 // Variable for the exercise timer progress. As initial value the exercise progress is set to 0. As we are about to start.
 
     private var binding: ActivityExerciseBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,14 +50,30 @@ class ExerciseActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                Toast.makeText(
-                    this@ExerciseActivity,
-                    "Here now we will start the exercise.",
-                    Toast.LENGTH_SHORT
-                ).show()
-
+                setupExerciseView()
             }
 
+        }.start()
+    }
+
+    private fun setExerciseProgressBar() {
+
+        binding?.progressBarExercise?.progress = exerciseProgress
+
+        exerciseTimer = object : CountDownTimer(30000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                exerciseProgress++
+                binding?.progressBarExercise?.progress = 30 - exerciseProgress
+                binding?.tvTimerExercise?.text = (30 - exerciseProgress).toString()
+            }
+
+            override fun onFinish() {
+                Toast.makeText(
+                    this@ExerciseActivity,
+                    "This is 30 seconds completed so now we will add all the exercises.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }.start()
     }
 
@@ -72,10 +91,33 @@ class ExerciseActivity : AppCompatActivity() {
         setRestProgressBar()
     }
 
+    private fun setupExerciseView() {
+
+        // Here according to the view make it visible as this is Exercise View so exercise view is visible and rest view is not.
+        binding?.flProgressBar?.visibility = View.INVISIBLE
+        binding?.tvTitle?.text = "Exercise Name"
+        binding?.flExerciseView?.visibility = View.VISIBLE
+
+        /**
+         * Here firstly we will check if the timer is running and it is not null then cancel the running timer and start the new one.
+         * And set the progress to the initial value which is 0.
+         */
+        if (exerciseTimer != null) {
+            exerciseTimer?.cancel()
+            exerciseProgress = 0
+        }
+
+        setExerciseProgressBar()
+    }
+
     override fun onDestroy() {
         if(resetTime != null){
             resetTime?.cancel()
             restProgress = 0
+        }
+        if (exerciseTimer != null) {
+            exerciseTimer?.cancel()
+            exerciseProgress = 0
         }
         super.onDestroy()
         binding = null
