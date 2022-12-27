@@ -103,6 +103,8 @@ class ExerciseActivity : AppCompatActivity() {
     private fun setupRestView(){
         binding?.flRestView?.visibility = View.VISIBLE
         binding?.tvTitle?.visibility = View.VISIBLE
+        binding?.upcomingLabel?.visibility = View.VISIBLE
+        binding?.tvUpcomingExerciseName?.visibility = View.VISIBLE
         binding?.tvExerciseName?.visibility = View.INVISIBLE
         binding?.flExerciseView?.visibility = View.INVISIBLE
         binding?.ivImage?.visibility = View.INVISIBLE
@@ -111,6 +113,7 @@ class ExerciseActivity : AppCompatActivity() {
             resetTime!!.cancel()
             restProgress = 0
         }
+        binding?.tvUpcomingExerciseName?.text = exerciseList!![currentExercisePosition + 1].getName()
         // This function is used to set the progress details.
         setRestProgressBar()
     }
@@ -120,6 +123,8 @@ class ExerciseActivity : AppCompatActivity() {
         // Here according to the view make it visible as this is Exercise View so exercise view is visible and rest view is not.
         binding?.flRestView?.visibility = View.INVISIBLE
         binding?.tvTitle?.visibility = View.INVISIBLE
+        binding?.upcomingLabel?.visibility = View.INVISIBLE
+        binding?.tvUpcomingExerciseName?.visibility = View.INVISIBLE
         binding?.tvExerciseName?.visibility = View.VISIBLE
         binding?.ivImage?.visibility = View.VISIBLE
         binding?.flExerciseView?.visibility = View.VISIBLE
