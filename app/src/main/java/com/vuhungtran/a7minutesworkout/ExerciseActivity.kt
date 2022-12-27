@@ -3,11 +3,15 @@ package com.vuhungtran.a7minutesworkout
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.vuhungtran.a7minutesworkout.databinding.ActivityExerciseBinding
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ExerciseActivity : AppCompatActivity() {
+class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     //Step 1 - START
     //Variable for Rest Timer and later on we will initialize it.
     private var resetTime: CountDownTimer? = null
@@ -20,6 +24,8 @@ class ExerciseActivity : AppCompatActivity() {
     private var exerciseTimerDuration:Long = 30
     private var exerciseList: ArrayList<ExerciseModel>? = null // We will initialize the list later.
     private var currentExercisePosition = -1 // Current Position of Exercise.
+
+    private var tts: TextToSpeech? = null
 
     private var binding: ActivityExerciseBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +41,8 @@ class ExerciseActivity : AppCompatActivity() {
         binding?.toolbarExercise?.setOnClickListener {
             onBackPressed()
         }
+
+        tts = TextToSpeech(this, this)
 
         // TODO(Step 7 - Initializing and Assigning a default exercise list to our list variable.)
         // START
@@ -138,15 +146,14 @@ class ExerciseActivity : AppCompatActivity() {
             exerciseProgress = 0
         }
 
-        // TODO(Step 9 - Setting up the current exercise name and image to view to the UI element.)
+        speakOut(exerciseList!![currentExercisePosition].getName())
+
+        // MARK: - Setting up the current exercise name and image to view to the UI element.)
         // START
         /**
          * Here current exercise name and image is set to exercise view.
          */
         binding?.ivImage?.setImageResource(exerciseList!![currentExercisePosition].getImage())
-        println("START: get image")
-        println(exerciseList!![currentExercisePosition].getImage())
-        println("END: get image")
         binding?.tvExerciseName?.text = exerciseList!![currentExercisePosition].getName()
         // END
 
@@ -162,7 +169,36 @@ class ExerciseActivity : AppCompatActivity() {
             exerciseTimer?.cancel()
             exerciseProgress = 0
         }
+        // MARK: - Shutting down the Text to Speech feature when activity is destroyed
+        // START
+        if (tts != null) {
+            tts!!.stop()
+            tts!!.shutdown()
+        }
         super.onDestroy()
         binding = null
     }
+
+    override fun onInit(status: Int) {
+        if(status == TextToSpeech.SUCCESS){
+            // set US English as language for tts
+            val result = tts?.setLanguage(Locale.US)
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "The Language specified is not supported!")
+            }
+        }else{
+            Log.e("TTS", "Initialization Failed!")
+        }
+    }
+
+    // MARK:  Making a function to speak the text.)
+    // START
+    /**
+     * Function is used to speak the text that we pass to it.
+     */
+    private fun speakOut(text: String) {
+        tts!!.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    }
+    // END
 }
