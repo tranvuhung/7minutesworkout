@@ -2,13 +2,16 @@ package com.vuhungtran.a7minutesworkout
 
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.vuhungtran.a7minutesworkout.databinding.ActivityExerciseBinding
 import java.util.*
 import kotlin.collections.ArrayList
@@ -32,6 +35,12 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var player: MediaPlayer? = null
 
     private var binding: ActivityExerciseBinding? = null
+
+    // START
+    // Declaring an exerciseAdapter object which will be initialized later.
+    private var exerciseAdapter: ExerciseStatusAdapter? = null
+    // END
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExerciseBinding.inflate(layoutInflater)
@@ -57,6 +66,12 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         //START
         setupRestView() // REST View is set in this function
         //END
+
+        // Calling the function where we have bound the adapter to recycler view to show the data in the UI.)
+        // START
+        // setting up the exercise recycler view
+        setupExerciseStatusRecyclerView()
+        // END
     }
 
     //STEP 2:
@@ -216,6 +231,26 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
      */
     private fun speakOut(text: String) {
         tts!!.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    }
+    // END
+
+    /**
+     * Function is used to set up the recycler view to UI and asining the Layout Manager and Adapter Class is attached to it.
+     */
+    // Binding adapter class to recycler view and setting the recycler view layout manager and passing a list to the adapter.)
+    // START
+    private fun setupExerciseStatusRecyclerView() {
+
+        // Defining a layout manager for the recycle view
+        // Here we have used a LinearLayout Manager with horizontal scroll.
+        binding?.rvExerciseStatus?.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        // As the adapter expects the exercises list and context so initialize it passing it.
+        exerciseAdapter = ExerciseStatusAdapter(exerciseList!!)
+
+        // Adapter class is attached to recycler view
+        binding?.rvExerciseStatus?.adapter = exerciseAdapter
     }
     // END
 }
