@@ -1,5 +1,6 @@
 package com.vuhungtran.a7minutesworkout
 
+import android.app.Dialog
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
@@ -14,6 +15,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vuhungtran.a7minutesworkout.databinding.ActivityExerciseBinding
+import com.vuhungtran.a7minutesworkout.databinding.DialogCustomBackConfirmationBinding
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -52,13 +54,15 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
 
-        binding?.toolbarExercise?.setOnClickListener {
-            onBackPressed()
+//        binding?.toolbarExercise?.setOnClickListener {
+//            onBackPressed()
+//        }
+        binding?.toolbarExercise?.setNavigationOnClickListener{
+            customDialogForBackButton()
         }
 
         tts = TextToSpeech(this, this)
 
-        // TODO(Step 7 - Initializing and Assigning a default exercise list to our list variable.)
         // START
         exerciseList = Constants.defaultExerciseList()
         // END
@@ -73,6 +77,11 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         // setting up the exercise recycler view
         setupExerciseStatusRecyclerView()
         // END
+    }
+
+    override fun onBackPressed() {
+        customDialogForBackButton()
+//        super.onBackPressed()
     }
 
     //STEP 2:
@@ -258,4 +267,21 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         binding?.rvExerciseStatus?.adapter = exerciseAdapter
     }
     // END
+
+    //custom dialog
+    private fun customDialogForBackButton(){
+        val customDialog = Dialog(this)
+        val dialogBinding = DialogCustomBackConfirmationBinding.inflate(layoutInflater)
+        customDialog.setContentView(dialogBinding.root)
+        customDialog.setCanceledOnTouchOutside(false)
+        dialogBinding.tvYes.setOnClickListener{
+            this@ExerciseActivity.finish()
+            customDialog.dismiss()
+        }
+        dialogBinding.tvNo.setOnClickListener{
+            customDialog.dismiss()
+        }
+
+        customDialog.show()
+    }
 }
